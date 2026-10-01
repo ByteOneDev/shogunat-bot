@@ -33,7 +33,9 @@ GUILD_ID = _int("GUILD_ID")
 ADMIN_ROLE_ID = _int("ADMIN_ROLE_ID")
 
 # Panneau web
-PUBLIC_URL = os.environ.get("PUBLIC_URL", "http://localhost:8080").rstrip("/")
+PUBLIC_URL = os.environ.get("PUBLIC_URL", "http://localhost:8080").strip().rstrip("/")
+if not PUBLIC_URL.startswith(("http://", "https://")):  # adresse collée sans https:// (ex. sur Railway)
+    PUBLIC_URL = "https://" + PUBLIC_URL
 # Sur Railway (et la plupart des hébergeurs), le port est imposé par la variable PORT
 WEB_HOST = "0.0.0.0" if os.environ.get("PORT") else os.environ.get("WEB_HOST", "127.0.0.1")
 WEB_PORT = _int("PORT") or _int("WEB_PORT", 8080)

@@ -56,9 +56,8 @@ class ShogunatBot(discord.Client):
         self.session_http = aiohttp.ClientSession()
         interactions.enregistrer(self)
         enregistrer_commandes(self)
-        guild = discord.Object(id=config.GUILD_ID)
-        self.tree.copy_global_to(guild=guild)
-        await self.tree.sync(guild=guild)
+        self.tree.copy_global_to(guild=discord.Object(id=config.GUILD_ID))
+        await self.synchroniser_commandes()
         self.boucle_statut.start()
         self.boucle_stats.start()
         self.boucle_annonces.start()
@@ -68,8 +67,26 @@ class ShogunatBot(discord.Client):
             await self.session_http.close()
         await super().close()
 
+    async def synchroniser_commandes(self):
+        """Enregistre /statut, /classement… sur le serveur. Sans planter si le bot n'y est pas encore."""
+        try:
+            await self.tree.sync(guild=discord.Object(id=config.GUILD_ID))
+            log.info("Commandes slash enregistrées sur le serveur %s", config.GUILD_ID)
+            return True
+        except discord.Forbidden:
+            log.warning("Le bot n'est pas (encore) sur le serveur Discord %s, ou GUILD_ID est faux. "
+                        "Invite-le avec ce lien, il s'activera tout seul : %s", config.GUILD_ID, self.lien_invitation(structure=True))
+            return False
+
     async def on_ready(self):
         log.info("Connecté en tant que %s", self.user)
+        if not self.guild:
+            log.warning("Serveur Discord %s introuvable pour le bot : il attend d'y être invité.", config.GUILD_ID)
+
+    async def on_guild_join(self, guild):
+        if guild.id == config.GUILD_ID:
+            log.info("Bot ajouté au serveur %s", guild.name)
+            await self.synchroniser_commandes()
 
     @property
     def guild(self) -> Optional[discord.Guild]:
