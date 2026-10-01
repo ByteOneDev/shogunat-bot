@@ -324,8 +324,10 @@ PAGES.mascottes = async () => {
 
 PAGES.structure = async () => {
   const s = await api("structure");
-  const NOMS = { annonces: "📢 annonces", statut: "🟢 statut", classements: "🏆 classements", faq: "❓ faq",
-                 suggestions: "💡 suggestions", tickets: "🎫 tickets", staff: "📋 journal-staff" };
+  const NOMS = { reglement: "Règlement et lore", annonces: "Annonces", statut: "Statut du serveur", faq: "FAQ",
+                 tickets: "Tickets", general: "Discussion générale", diplomatie: "Diplomatie", classements: "Classements",
+                 suggestions: "Suggestions", galerie: "Galerie", guerre: "Proclamations de guerre", staff: "Journal du staff",
+                 tribunal: "Tribunal du staff" };
   page.innerHTML = `
     <div class="entete"><h1>Structure Discord</h1></div>
     ${!s.bot_pret ? `<div class="alerte">Le bot n'est pas connecté au serveur Discord. Invite-le avec le lien ci-dessous.</div><br>` : ""}
@@ -348,9 +350,10 @@ PAGES.structure = async () => {
     </div><br>
     <div class="carte pile">
       <h2>2. Salons et rôles</h2>
-      <p class="discret petit">Crée les catégories Shogunat, Staff et Clans, leurs salons, les rôles des 4 clans et du staff,
-        les mascottes de clan, puis publie les messages (statut, classements, FAQ, menu des tickets). Les salons qui existent
-        déjà sont réutilisés : tu peux relancer sans risque de doublon.</p>
+      <p class="discret petit">Applique la structure du lore : Île des Cerisiers, Temple du Conseil, Plaines de Sang, Bakufu
+        (staff) et une catégorie privée par clan (discussion, salle de stratégie, vocal). Crée les rôles des clans et du staff,
+        les mascottes de clan, puis publie les messages (règlement, statut, classements, FAQ, tickets). Les salons existants sont
+        renommés et déplacés, jamais dupliqués. Pour les anciens salons : <code>/structure nettoyer</code> sur Discord.</p>
       <div><button class="principal" id="b-creer" ${s.bot_pret && !s.manque_structure.length ? "" : "disabled"}>Créer / réparer la structure</button></div>
       <div id="rapport"></div>
       <table><tbody>${Object.entries(NOMS).map(([cle, nom]) => `<tr><td>${nom}</td><td>${s.salons[cle] && s.salons[cle].nom

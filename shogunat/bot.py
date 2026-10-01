@@ -16,26 +16,11 @@ SAKURA = 0xFF5FAE
 OR = 0xB84DFF
 ROUGE = 0xD63A8C
 
-# Salons créés par « Créer la structure ». La clé sert dans db.reglage("salons").
-# lecture_seule : les membres lisent mais n'écrivent pas (le bot publie).
-STRUCTURE = [
-    ("⛩・Shogunat", [
-        ("annonces", "📢・annonces", "Annonces officielles du Shogunat.", True),
-        ("statut", "🟢・statut", "État du serveur Minecraft, mis à jour chaque minute.", True),
-        ("classements", "🏆・classements", "Classements des joueurs et des clans.", True),
-        ("faq", "❓・faq", "Questions fréquentes. Tape /faq pour chercher.", True),
-        ("suggestions", "💡・suggestions", "Propose un mod ou une fonctionnalité avec /suggestion, vote avec 👍 / 👎.", True),
-        ("tickets", "🎫・tickets", "Besoin d'aide ? Ouvre un ticket avec le menu ci-dessous.", True),
-    ]),
-]
-CATEGORIE_STAFF = ("🔒・Staff", "staff", "📋・journal-staff", "Nouveaux tickets et suggestions (staff uniquement).")
-CATEGORIE_CLANS = "⚔・Clans"
-
 # Permissions dont le bot a besoin au quotidien (lien d'invitation « normal »)
 PERMS_QUOTIDIEN = discord.Permissions(
     view_channel=True, send_messages=True, embed_links=True, attach_files=True, read_message_history=True,
-    add_reactions=True, use_external_emojis=True, create_private_threads=True, send_messages_in_threads=True,
-    manage_threads=True, change_nickname=True,
+    add_reactions=True, use_external_emojis=True, create_public_threads=True, create_private_threads=True,
+    send_messages_in_threads=True, manage_threads=True, change_nickname=True, connect=True, speak=True,
 )
 # En plus, seulement le temps de « Créer la structure » (salons, rôles, webhooks des clans)
 PERMS_STRUCTURE = discord.Permissions(manage_channels=True, manage_roles=True, manage_webhooks=True)
@@ -52,9 +37,10 @@ class ShogunatBot(discord.Client):
     # --- démarrage ------------------------------------------------------------------
 
     async def setup_hook(self):
-        from . import interactions
+        from . import interactions, structure
         self.session_http = aiohttp.ClientSession()
         interactions.enregistrer(self)
+        structure.enregistrer(self)
         enregistrer_commandes(self)
         self.tree.copy_global_to(guild=discord.Object(id=config.GUILD_ID))
         await self.synchroniser_commandes()
@@ -266,87 +252,12 @@ class ShogunatBot(discord.Client):
         return [nom for nom, voulu in perms if voulu and not getattr(actuelles, nom)]
 
     async def creer_structure(self):
-        """Crée (ou retrouve) rôles, salons et webhooks. Peut être relancé sans rien dupliquer."""
-        guild = self.guild
+        """Structure tirée du lore (voir shogunat/structure.py). Peut être relancée sans rien dupliquer."""
+        from . import structure
         manque = self.permissions_manquantes(PERMS_STRUCTURE)
         if manque:
             raise PermissionError(manque)
-        rapport = []
-        raison = "Structure Shogunat (panneau d'admin)"
-        moi = guild.me
-
-        async def role(nom, couleur=None):
-            r = discord.utils.get(guild.roles, name=nom)
-            if r:
-                return r
-            rapport.append(f"rôle « {nom} » créé")
-            return await guild.create_role(name=nom, colour=couleur or discord.Colour.default(), reason=raison)
-
-        async def categorie(nom, overwrites=None):
-            c = discord.utils.get(guild.categories, name=nom)
-            if c:
-                return c
-            rapport.append(f"catégorie « {nom} » créée")
-            return await guild.create_category(nom, overwrites=overwrites or {}, reason=raison)
-
-        async def salon(cat, nom, sujet, overwrites, cle_existante=None):
-            existant = guild.get_channel(cle_existante) if cle_existante else None
-            existant = existant or discord.utils.get(cat.text_channels, name=nom)
-            if existant:
-                return existant
-            rapport.append(f"salon #{nom} créé")
-            return await guild.create_text_channel(nom, category=cat, topic=sujet, overwrites=overwrites, reason=raison)
-
-        staff = self.role_staff()
-        if not staff:
-            staff = await role("Staff Shogunat", discord.Colour(OR))
-            db.definir("role_staff", staff.id)
-
-        bot_ok = discord.PermissionOverwrite(view_channel=True, send_messages=True, embed_links=True,
-                                             manage_threads=True, create_private_threads=True,
-                                             send_messages_in_threads=True, manage_webhooks=True)
-        lecture = {guild.default_role: discord.PermissionOverwrite(send_messages=False, add_reactions=True,
-                                                                   create_public_threads=False,
-                                                                   create_private_threads=False),
-                   moi: bot_ok, staff: discord.PermissionOverwrite(send_messages=True)}
-        salons = db.reglage("salons") or {}
-        for nom_cat, liste in STRUCTURE:
-            cat = await categorie(nom_cat)
-            for cle, nom, sujet, _ in liste:
-                ow = dict(lecture)
-                if cle == "tickets":  # les membres écrivent seulement dans leur fil privé
-                    ow[guild.default_role] = discord.PermissionOverwrite(send_messages=False,
-                                                                         send_messages_in_threads=True)
-                salons[cle] = (await salon(cat, nom, sujet, ow, salons.get(cle))).id
-
-        prive = {guild.default_role: discord.PermissionOverwrite(view_channel=False),
-                 moi: bot_ok, staff: discord.PermissionOverwrite(view_channel=True, send_messages=True)}
-        cat_staff = await categorie(CATEGORIE_STAFF[0], prive)
-        salons["staff"] = (await salon(cat_staff, CATEGORIE_STAFF[2], CATEGORIE_STAFF[3], prive,
-                                       salons.get("staff"))).id
-        db.definir("salons", salons)
-
-        cat_clans = await categorie(CATEGORIE_CLANS)
-        for clan in db.tous("SELECT * FROM clans ORDER BY slug"):
-            r = guild.get_role(clan["role_id"] or 0) or await role(clan["nom"], discord.Colour(int(clan["couleur"][1:], 16)))
-            ow = {guild.default_role: discord.PermissionOverwrite(view_channel=False),
-                  r: discord.PermissionOverwrite(view_channel=True, send_messages=True),
-                  staff: discord.PermissionOverwrite(view_channel=True, send_messages=True), moi: bot_ok}
-            nom_salon = f"{clan['kanji'] or ''}・{clan['slug']}".lstrip("・")
-            s = await salon(cat_clans, nom_salon, f"Salon du clan {clan['nom']}.", ow, clan["salon_id"])
-            champs = {"role_id": r.id, "salon_id": s.id}
-            if not clan["webhook_url"]:
-                wh = await s.create_webhook(name=f"Mascotte {clan['nom']}", reason=raison)
-                champs["webhook_url"] = wh.url
-                rapport.append(f"mascotte du clan {clan['nom']} prête")
-            db.maj("clans", "slug", clan["slug"], champs)
-
-        from . import interactions
-        await interactions.publier_panneau_tickets(self)
-        await interactions.publier_faq(self)
-        await self.publier_classements()
-        rapport.append("messages des salons publiés")
-        return rapport
+        return await structure.ranger(self)
 
     def lien_invitation(self, structure=False):
         perms = discord.Permissions(PERMS_QUOTIDIEN.value | (PERMS_STRUCTURE.value if structure else 0))

@@ -27,6 +27,34 @@ pour les ajouter, puis tu les retires (voir étape 4).
 
 ---
 
+## Structure du serveur et commandes du staff
+
+La structure suit le lore du Shogunat :
+
+| Catégorie | Salons | Accès |
+|---|---|---|
+| 🌸 Île des Cerisiers | porte-torii (règlement et lore), cor-du-shogun (annonces), lanterne-du-portail (statut), parchemins (FAQ), doléances (tickets) | lecture pour tous |
+| 🏯 Temple du Conseil | maison-de-thé, table-des-traités, tableau-d-honneur (classements), requêtes-au-shogun (suggestions), galerie-des-bâtisseurs, Jardin de thé (vocal) | public |
+| ⚔ Plaines de Sang | proclamations (guerres et paix), Champ de bataille (vocal) | public |
+| 🔒 Bakufu | registre-du-bakufu (journal du bot), tribunal-du-shogun, Conseil restreint (vocal) | staff |
+| 🔥🌊🌑🌿 Clan … | salon de discussion (où parle la mascotte), salle de stratégie, vocal | membres du clan + staff |
+
+Commandes (admin, modérateur ou rôle Staff Shogunat ; invisibles pour les autres) :
+
+| Commande | Effet |
+|---|---|
+| `/structure apercu` | ce qui manque ou serait renommé/déplacé, et la liste des anciens salons |
+| `/structure ranger` | applique la structure (crée, renomme, déplace, règle les accès), après confirmation |
+| `/structure nettoyer` | archive (réversible) ou supprime les anciens salons, après confirmation |
+| `/structure supprimer` | supprime un salon précis, après confirmation |
+| `/structure visibilite` | rend un salon public, en lecture seule, réservé à un clan ou au staff |
+| `/structure salon-clan` | ajoute un salon privé (texte ou vocal) à un clan |
+| `/banniere donner` / `retirer` | donne ou retire à un membre le rôle de son clan |
+
+Ces commandes demandent au bot « Gérer les salons / les rôles / les webhooks ». S'il ne les a pas, il le dit et donne
+le lien pour les lui accorder le temps de l'opération ; retire-les ensuite. Pour `/banniere`, le rôle du bot doit être
+placé au-dessus des rôles de clan.
+
 ## Étape 1 : créer l'application Discord
 
 1. Va sur https://discord.com/developers/applications → **New Application**, nomme-la comme ta mascotte.
