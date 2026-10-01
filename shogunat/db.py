@@ -72,13 +72,14 @@ CREATE TABLE IF NOT EXISTS clans (
 );
 """
 
-# Les 4 clans du script KubeJS shogunat_clans.js
+# Les 4 clans du script KubeJS shogunat_clans.js, avec leur mascotte (nom par défaut, image)
 CLANS_DEFAUT = [
-    ("akamatsu", "Akamatsu", "赤松", "#C0392B"),
-    ("mizuki", "Mizuki", "水樹", "#2980B9"),
-    ("kurogane", "Kurogane", "黒鉄", "#8E44AD"),
-    ("shinrin", "Shinrin", "森林", "#27AE60"),
+    ("akamatsu", "Akamatsu", "赤松", "#C0392B", "Hibana"),
+    ("mizuki", "Mizuki", "水樹", "#2980B9", "Shizuku"),
+    ("kurogane", "Kurogane", "黒鉄", "#8E44AD", "Murasaki"),
+    ("shinrin", "Shinrin", "森林", "#27AE60", "Kodama"),
 ]
+MASCOTTE_DEFAUT = {"nom": "Sakura", "avatar_url": config.mascotte_url("sakura")}
 
 _conn = None
 
@@ -89,9 +90,9 @@ def conn():
         _conn = sqlite3.connect(str(config.DB_PATH))
         _conn.row_factory = sqlite3.Row
         _conn.executescript(SCHEMA)
-        for slug, nom, kanji, couleur in CLANS_DEFAUT:
-            _conn.execute("INSERT OR IGNORE INTO clans (slug, nom, kanji, couleur, mascotte_nom) VALUES (?, ?, ?, ?, ?)",
-                          (slug, nom, kanji, couleur, f"Esprit de {nom}"))
+        for slug, nom, kanji, couleur, mascotte in CLANS_DEFAUT:
+            _conn.execute("INSERT OR IGNORE INTO clans (slug, nom, kanji, couleur, mascotte_nom, mascotte_avatar) "
+                          "VALUES (?, ?, ?, ?, ?, ?)", (slug, nom, kanji, couleur, mascotte, config.mascotte_url(slug)))
         _conn.commit()
     return _conn
 

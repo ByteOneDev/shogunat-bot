@@ -9,8 +9,8 @@ from . import db
 
 log = logging.getLogger("shogunat.interactions")
 
-SAKURA = 0xF07AB2
-COULEURS_SUGGESTION = {"en_attente": 0xCF9D3F, "acceptee": 0x4ADE80, "refusee": 0xB3291C, "faite": 0x2980B9}
+SAKURA = 0xFF5FAE
+COULEURS_SUGGESTION = {"en_attente": 0xB84DFF, "acceptee": 0x4ADE80, "refusee": 0xB3291C, "faite": 0x2980B9}
 LIBELLES_SUGGESTION = {"en_attente": "⏳ En attente", "acceptee": "✅ Acceptée", "refusee": "❌ Refusée",
                        "faite": "🎉 Ajoutée au serveur"}
 TYPES_SUGGESTION = {"mod": "🧩 Mod", "fonctionnalite": "✨ Fonctionnalité"}

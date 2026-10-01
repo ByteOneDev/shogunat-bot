@@ -12,9 +12,9 @@ from . import config, db, minecraft
 
 log = logging.getLogger("shogunat.bot")
 
-SAKURA = 0xF07AB2
-OR = 0xCF9D3F
-ROUGE = 0xB3291C
+SAKURA = 0xFF5FAE
+OR = 0xB84DFF
+ROUGE = 0xD63A8C
 
 # Salons créés par « Créer la structure ». La clé sert dans db.reglage("salons").
 # lecture_seule : les membres lisent mais n'écrivent pas (le bot publie).
@@ -342,6 +342,7 @@ class ShogunatBot(discord.Client):
 def embed_statut(st):
     if st["en_ligne"]:
         e = discord.Embed(title="🟢 Serveur en ligne", color=0x4ADE80)
+        e.set_thumbnail(url=config.mascotte_url("sakura"))
         e.add_field(name="Joueurs", value=f"**{st['joueurs']}** / {st['max']}")
         e.add_field(name="Version", value=st["version"] or "?")
         e.add_field(name="Ping", value=f"{st['latence']} ms")
@@ -350,6 +351,7 @@ def embed_statut(st):
     else:
         e = discord.Embed(title="🔴 Serveur hors ligne", color=ROUGE,
                           description="Le serveur est éteint ou redémarre. Réessaie dans quelques minutes.")
+        e.set_thumbnail(url=config.mascotte_url("sakura-triste"))
     e.add_field(name="Adresse", value=f"`{config.MC_ADRESSE}`", inline=False)
     e.set_footer(text="Mis à jour")
     e.timestamp = discord.utils.utcnow()

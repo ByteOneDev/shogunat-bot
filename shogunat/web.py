@@ -316,7 +316,7 @@ class Panneau:
             c["salon_id"], c["role_id"] = str(c["salon_id"] or ""), str(c["role_id"] or "")
             membres = (stats.get("clans", {}).get(c["slug"]) or {}).get("membres", [])
             c["membres"] = [m.get("n") or (stats.get("joueurs", {}).get(m["u"]) or {}).get("n") or "?" for m in membres]
-        return web.json_response({"clans": clans, "mascotte": db.reglage("mascotte", {"nom": "", "avatar_url": ""})})
+        return web.json_response({"clans": clans, "mascotte": db.reglage("mascotte", db.MASCOTTE_DEFAUT)})
 
     async def api_clan_maj(self, request):
         d = await request.json()

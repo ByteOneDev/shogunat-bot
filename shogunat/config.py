@@ -44,6 +44,14 @@ RCON_HOST = os.environ.get("RCON_HOST", "91.197.6.134")
 RCON_PORT = _int("RCON_PORT")
 RCON_PASSWORD = os.environ.get("RCON_PASSWORD", "")
 
+# Images des mascottes (PNG carrés), publiées avec le site GitHub Pages
+ASSETS_URL = os.environ.get("ASSETS_URL", "https://byteonedev.github.io/sites-SMP/assets/mascottes").rstrip("/")
+
+
+def mascotte_url(nom):
+    return f"{ASSETS_URL}/{nom}.png"
+
+
 DB_PATH = Path(os.environ.get("DB_PATH", str(RACINE / "shogunat.db")))
 
 
