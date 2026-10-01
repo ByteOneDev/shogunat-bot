@@ -50,7 +50,36 @@ pour les ajouter, puis tu les retires (voir étape 4).
 
 Le mot de passe RCON donne un accès complet à la console : ne le partage jamais.
 
-## Étape 3 : héberger sur Oracle Cloud (gratuit)
+## Étape 3 : héberger sur Railway (recommandé, environ 5 $/mois)
+
+Railway fait tourner le bot et le panneau 24h/24, avec une adresse HTTPS fournie, sans rien installer.
+Offre **Hobby** : 5 $/mois, qui incluent 5 $ de consommation ; ce bot en consomme nettement moins.
+
+1. Va sur https://railway.com et connecte-toi avec GitHub, puis passe à l'offre **Hobby**.
+2. **New Project → Deploy from GitHub repo** → choisis le dépôt privé `shogunat-bot`.
+   Railway détecte Python, installe `requirements.txt` et lance `python run.py` (réglé dans `railway.json`).
+3. **Volume** (pour garder la base de données entre deux redémarrages) : dans le projet, clic droit sur le service
+   → **Attach Volume** → chemin de montage `/data`.
+4. **Adresse** : onglet **Settings → Networking → Generate Domain**, ex. `shogunat-bot-production.up.railway.app`.
+5. **Variables** : onglet **Variables → Raw Editor**, colle :
+   ```
+   DISCORD_TOKEN=...
+   DISCORD_CLIENT_ID=...
+   DISCORD_CLIENT_SECRET=...
+   GUILD_ID=...
+   SESSION_SECRET=...
+   PUBLIC_URL=https://shogunat-bot-production.up.railway.app
+   DB_PATH=/data/shogunat.db
+   RCON_HOST=91.197.6.134
+   RCON_PORT=...
+   RCON_PASSWORD=...
+   ```
+   Ne mets pas `WEB_HOST` ni `WEB_PORT` : Railway fournit le port lui-même.
+6. Dans le portail Discord, **OAuth2 → Redirects** : ajoute `https://shogunat-bot-production.up.railway.app/callback`.
+7. Railway redéploie tout seul. Les journaux du bot sont dans l'onglet **Deployments → View logs**.
+   Chaque `git push` sur le dépôt met le bot à jour automatiquement.
+
+## Variante : héberger sur Oracle Cloud (gratuit, plus long à installer)
 
 1. Crée un compte sur https://www.oracle.com/cloud/free/ (une carte bancaire est demandée pour vérification, rien n'est débité
    tant que tu restes sur les offres « Always Free »).
@@ -75,7 +104,7 @@ Le mot de passe RCON donne un accès complet à la console : ne le partage jamai
 
 ## Étape 4 : premier lancement
 
-1. Ouvre le panneau (`https://152-70-12-34.sslip.io`), onglet **Structure Discord**.
+1. Ouvre le panneau (ton adresse Railway, ou `https://152-70-12-34.sslip.io` sur Oracle), onglet **Structure Discord**.
 2. Clique **« Lien avec les permissions de structure »** et ajoute le bot à ton serveur.
 3. Connecte-toi au panneau avec Discord (il faut avoir « Gérer le serveur » sur Discord).
 4. **Créer / réparer la structure** : salons, rôles, mascottes de clan, messages de statut, classements, FAQ et tickets.
@@ -116,5 +145,6 @@ shogunat/interactions.py    tickets, FAQ (/faq), suggestions (/suggestion)
 shogunat/web.py             panneau : connexion Discord + API
 shogunat/static/            interface du panneau
 kubejs/shogunat_discord.js  à copier sur le serveur Minecraft
-deploy/                     installation sur Oracle Cloud
+railway.json                réglages Railway
+deploy/                     installation sur Oracle Cloud (variante)
 ```
