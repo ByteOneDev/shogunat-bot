@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Panneau du Shogunat</title>
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+  <div id="ecran-connexion" class="connexion" hidden>
+    <div class="carte pile">
+      <div class="kanji">将軍</div>
+      <h1>Panneau du Shogunat</h1>
+      <p class="discret">Réservé au staff. Connecte-toi avec ton compte Discord.</p>
+      <a class="bouton principal centre" href="/login">Se connecter avec Discord</a>
+    </div>
+  </div>
+
+  <div id="ecran-app" class="app" hidden>
+    <nav class="menu">
+      <div class="logo">将軍統 <small>admin</small></div>
+      <a href="#tableau">🏯 Tableau de bord</a>
+      <a href="#annonces">📢 Annonces</a>
+      <a href="#classements">🏆 Classements</a>
+      <a href="#tickets">🎫 Tickets <span class="badge" id="nb-tickets" hidden></span></a>
+      <a href="#faq">❓ FAQ</a>
+      <a href="#suggestions">💡 Suggestions <span class="badge" id="nb-suggestions" hidden></span></a>
+      <a href="#mascottes">🦊 Mascottes &amp; clans</a>
+      <a href="#structure">⚙️ Structure Discord</a>
+      <div class="moi"><img id="moi-avatar" alt="" hidden><span id="moi-nom"></span><a href="/logout" title="Se déconnecter">⏻</a></div>
+    </nav>
+    <main id="page"></main>
+  </div>
+
+  <div id="toast" hidden></div>
+  <script src="/static/app.js"></script>
+</body>
+</html>

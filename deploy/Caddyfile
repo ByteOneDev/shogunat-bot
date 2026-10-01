@@ -1,0 +1,5 @@
+# HTTPS automatique (Let's Encrypt). Remplace l'adresse par la tienne,
+# ex. 152-70-12-34.sslip.io (ton IP publique avec des tirets) ou ton propre domaine.
+ADRESSE_DU_PANNEAU {
+	reverse_proxy 127.0.0.1:8080
+}
