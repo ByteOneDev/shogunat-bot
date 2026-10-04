@@ -27,6 +27,14 @@ pour les ajouter, puis tu les retires (voir étape 4).
 
 ---
 
+## Objectif mensuel du site
+
+Onglet **Objectif mensuel** du panneau : montant récolté, objectif du mois et devise. Le site (saison 1) lit ces valeurs à chaque
+visite, via `https://<adresse du panneau>/public/objectif` ; un changement est visible dans la minute, sans republier le site.
+Le bouton « Nouveau mois » remet le montant à 0. Si le panneau est éteint, le site affiche les valeurs de son `config.json`.
+Cette adresse est réglée dans `panel.objectifUrl` du `config.json` du site. Variable `SITE_ORIGIN` (par défaut
+`https://byteonedev.github.io`) : le site autorisé à lire cet objectif ; à changer si tu utilises un nom de domaine.
+
 ## Structure du serveur et commandes du staff
 
 La structure suit le lore du Shogunat :

@@ -47,6 +47,9 @@ RCON_HOST = os.environ.get("RCON_HOST", "91.197.6.134")
 RCON_PORT = _int("RCON_PORT")
 RCON_PASSWORD = os.environ.get("RCON_PASSWORD", "")
 
+# Site public (GitHub Pages) autorisé à lire l'objectif mensuel exposé par le panneau
+SITE_ORIGIN = os.environ.get("SITE_ORIGIN", "https://byteonedev.github.io").strip().rstrip("/")
+
 # Images des mascottes (PNG carrés), publiées avec le site GitHub Pages
 ASSETS_URL = os.environ.get("ASSETS_URL", "https://byteonedev.github.io/sites-SMP/assets/mascottes").rstrip("/")
 

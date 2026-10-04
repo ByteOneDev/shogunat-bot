@@ -306,6 +306,42 @@ class Panneau:
         await maj_suggestion(self.exiger_bot(), sid, d["statut"], texte(d, "note", 1000))
         return web.json_response({"ok": True})
 
+    # --- objectif mensuel (affiché sur le site) -----------------------------------------------
+
+    OBJECTIF_DEFAUT = {"montant": 0, "objectif": 60, "devise": "€"}
+
+    async def public_objectif(self, request):
+        """Lu par le site public : trois nombres, rien d'autre. 404 tant que le staff n'a rien réglé."""
+        en_tetes = {"Access-Control-Allow-Origin": config.SITE_ORIGIN, "Vary": "Origin",
+                    "Cache-Control": "public, max-age=30"}
+        o = db.reglage("objectif")
+        if not o:
+            return web.json_response({"configure": False}, status=404, headers=en_tetes)
+        return web.json_response({k: o[k] for k in ("montant", "objectif", "devise")}, headers=en_tetes)
+
+    async def api_objectif(self, request):
+        o = db.reglage("objectif")
+        return web.json_response({"configure": bool(o), **(o or self.OBJECTIF_DEFAUT), "maj_le": (o or {}).get("maj_le"),
+                                  "maj_par": (o or {}).get("maj_par")})
+
+    async def api_objectif_maj(self, request):
+        d = await request.json()
+        try:
+            montant, objectif = float(d.get("montant")), float(d.get("objectif"))
+        except (TypeError, ValueError):
+            raise Erreur("le montant et l'objectif doivent être des nombres.")
+        if not (0 <= montant <= 1_000_000) or not (0 < objectif <= 1_000_000):
+            raise Erreur("montant entre 0 et 1 000 000, objectif supérieur à 0.")
+        devise = texte(d, "devise", 3) or "€"
+        nombre = lambda v: int(v) if v == int(v) else round(v, 2)
+        o = {"montant": nombre(montant), "objectif": nombre(objectif), "devise": devise,
+             "maj_le": int(time.time()), "maj_par": request["user"]["nom"]}
+        db.definir("objectif", o)
+        if self.bot and self.bot.is_ready():
+            await self.bot.journal(f"💰 Objectif mensuel mis à jour par **{o['maj_par']}** : "
+                                   f"{o['montant']}{devise} / {o['objectif']}{devise}")
+        return await self.api_objectif(request)
+
     # --- clans et mascottes ---------------------------------------------------------------
 
     async def api_clans(self, request):
@@ -402,6 +438,9 @@ class Panneau:
         r.add_post("/api/faq/publier", self.api_faq_publier)
         r.add_get("/api/suggestions", self.api_suggestions)
         r.add_post("/api/suggestions/{id:\\d+}/statut", self.api_suggestion_statut)
+        r.add_get("/public/objectif", self.public_objectif)
+        r.add_get("/api/objectif", self.api_objectif)
+        r.add_put("/api/objectif", self.api_objectif_maj)
         r.add_get("/api/clans", self.api_clans)
         r.add_put("/api/clans/{slug:[a-z]+}", self.api_clan_maj)
         r.add_post("/api/clans/{slug:[a-z]+}/message", self.api_clan_message)

@@ -277,6 +277,52 @@ PAGES.suggestions = async () => {
   }));
 };
 
+PAGES.objectif = async () => {
+  const o = await api("objectif");
+  const pct = (m, g) => (g > 0 ? Math.min(100, Math.round((m / g) * 100)) : 0);
+  page.innerHTML = `
+    <div class="entete"><h1>Objectif mensuel</h1></div>
+    <p class="discret petit">Affiché sur le site, dans la section « Soutenez le Shogunat ». Le site lit ces valeurs à chaque visite :
+      ton changement est visible dans la minute qui suit, sans rien republier.</p>
+    ${o.configure ? "" : `<div class="info">Rien n'est encore réglé ici : le site affiche pour l'instant les valeurs de son fichier config.json.
+      Enregistre une première fois pour que le panneau prenne la main.</div><br>`}
+    <form id="f-objectif" class="carte pile">
+      <div class="champs">
+        <label>Montant récolté ce mois-ci<input id="o-montant" name="montant" type="number" min="0" step="0.01" required value="${e(o.montant)}"></label>
+        <label>Objectif du mois<input id="o-objectif" name="objectif" type="number" min="1" step="0.01" required value="${e(o.objectif)}"></label>
+        <label>Devise<select name="devise">
+          ${["€", "$", "£"].map(d => `<option value="${d}" ${d === o.devise ? "selected" : ""}>${d}</option>`).join("")}
+        </select></label>
+      </div>
+      <div>
+        <div class="ligne"><strong id="o-texte"></strong><span class="discret petit" id="o-pct"></span></div>
+        <progress id="o-barre" max="100" value="0"></progress>
+      </div>
+      <div class="ligne">
+        <button class="principal">Enregistrer</button>
+        <button type="button" id="o-nouveau" title="Remet le montant récolté à 0 (n'est appliqué qu'après Enregistrer)">Nouveau mois</button>
+        ${o.maj_le ? `<span class="discret petit">Dernière modification ${ilYa(o.maj_le)} par ${e(o.maj_par || "?")}</span>` : ""}
+      </div>
+    </form>`;
+  const f = document.getElementById("f-objectif");
+  const apercu = () => {
+    const d = formulaire(f);
+    const m = Number(d.montant) || 0, g = Number(d.objectif) || 0;
+    document.getElementById("o-texte").textContent = `${m}${d.devise} / ${g}${d.devise}`;
+    document.getElementById("o-pct").textContent = `${pct(m, g)}% de l'objectif atteint`;
+    document.getElementById("o-barre").value = pct(m, g);
+  };
+  f.addEventListener("input", apercu);
+  apercu();
+  document.getElementById("o-nouveau").addEventListener("click", () => { document.getElementById("o-montant").value = 0; apercu(); });
+  f.addEventListener("submit", async ev => {
+    ev.preventDefault();
+    const d = formulaire(f);
+    if (await action(ev.submitter, () => api("objectif", { method: "PUT", corps: { montant: d.montant, objectif: d.objectif, devise: d.devise } }),
+      "Objectif enregistré : visible sur le site dans la minute")) PAGES.objectif();
+  });
+};
+
 PAGES.mascottes = async () => {
   const { clans, mascotte } = await api("clans");
   const img = url => url ? `<img class="avatar" src="${lien(url)}" alt="">` : `<div class="avatar"></div>`;
