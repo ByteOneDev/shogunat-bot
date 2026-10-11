@@ -36,9 +36,12 @@ ADMIN_ROLE_ID = _int("ADMIN_ROLE_ID")
 PUBLIC_URL = os.environ.get("PUBLIC_URL", "http://localhost:8080").strip().rstrip("/")
 if not PUBLIC_URL.startswith(("http://", "https://")):  # adresse collée sans https:// (ex. sur Railway)
     PUBLIC_URL = "https://" + PUBLIC_URL
-# Sur Railway (et la plupart des hébergeurs), le port est imposé par la variable PORT
-WEB_HOST = "0.0.0.0" if os.environ.get("PORT") else os.environ.get("WEB_HOST", "127.0.0.1")
-WEB_PORT = _int("PORT") or _int("WEB_PORT", 8080)
+# Chez les hébergeurs, le port est imposé : PORT (Railway, Render…) ou SERVER_PORT (panels de type Pterodactyl)
+_PORT_IMPOSE = _int("PORT") or _int("SERVER_PORT")
+WEB_HOST = "0.0.0.0" if _PORT_IMPOSE else os.environ.get("WEB_HOST", "127.0.0.1")
+WEB_PORT = _PORT_IMPOSE or _int("WEB_PORT", 8080)
+# PANEL=off : seul le bot tourne (hébergeur sans port public). Le bot n'en a pas besoin pour fonctionner.
+PANEL_ACTIF = os.environ.get("PANEL", "on").strip().lower() not in {"off", "0", "non", "no", "false"}
 SESSION_SECRET = os.environ.get("SESSION_SECRET", "")
 
 # Serveur Minecraft
@@ -66,11 +69,11 @@ def problemes():
     manque = []
     if not DISCORD_TOKEN:
         manque.append("DISCORD_TOKEN")
-    if not (DISCORD_CLIENT_ID and DISCORD_CLIENT_SECRET):
+    if PANEL_ACTIF and not (DISCORD_CLIENT_ID and DISCORD_CLIENT_SECRET):
         manque.append("DISCORD_CLIENT_ID / DISCORD_CLIENT_SECRET (connexion au panneau)")
     if not GUILD_ID:
         manque.append("GUILD_ID")
-    if len(SESSION_SECRET) < 32:
+    if PANEL_ACTIF and len(SESSION_SECRET) < 32:
         manque.append("SESSION_SECRET (au moins 32 caractères)")
     if not (RCON_PORT and RCON_PASSWORD):
         manque.append("RCON_PORT / RCON_PASSWORD (classements et annonces en jeu)")

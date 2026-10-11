@@ -86,7 +86,36 @@ placé au-dessus des rôles de clan.
 
 Le mot de passe RCON donne un accès complet à la console : ne le partage jamais.
 
-## Étape 3 : héberger sur Railway (recommandé, environ 5 $/mois)
+## Étape 3 (au choix) : héberger sur SpaceNode (environ 0,50 €/mois)
+
+Hébergeur de bots avec panneau de contrôle. Les offres annoncent Python 3.10 ou plus, une redémarrage automatique et 24/7.
+Le palier à 0,50 €/mois (512 Mo de RAM, 10 Go) suffit largement : ce programme demande environ 100 à 150 Mo.
+Paiement par 6 mois (environ 3 €). Le palier gratuit (64 Mo) est trop juste.
+
+**À vérifier avant de payer** (les pages de l'hébergeur ne le disent pas) : (1) combien de bots ou de serveurs un abonnement
+peut contenir, (2) si un port public est attribué au bot, (3) si les fichiers (notre base `shogunat.db`) survivent à un
+redémarrage. Le plus simple : poser la question au support SpaceNode.
+
+Ce projet ne contient qu'**un seul bot** (Sakura) : les mascottes de clan sont des webhooks, pas des bots à part.
+
+Installation :
+1. Sur ton Mac, fabrique une archive propre (sans `.env` ni `.venv`) :
+   ```bash
+   cd "/Users/perez_matthieu/Desktop/smp Project/shogunat-bot" && git archive --format=zip -o ~/Desktop/shogunat-bot.zip HEAD
+   ```
+2. Dans le panneau SpaceNode : crée le serveur de bot (Python), envoie l'archive et décompresse-la.
+   Fichier à lancer : `run.py`. Dépendances : `requirements.txt` (installées par l'hébergeur ; sinon `pip install -r requirements.txt`).
+3. Crée le fichier `.env` **directement dans le panneau** (copie de `.env.example`), jamais dans l'archive.
+4. Sans port public, mets `PANEL=off` : le bot tourne seul (statut, classements, annonces programmées depuis la base,
+   tickets, FAQ, suggestions, `/structure`, `/banniere`). L'onglet admin web n'est alors pas disponible.
+5. Démarre. Dans la console, tu dois lire « Connecté en tant que Sakura ».
+
+**Le panneau web chez SpaceNode.** S'il attribue un port, le programme l'utilise (variable `SERVER_PORT`). Mais Discord et le
+site demandent une adresse **HTTPS** : sans nom de domaine ni tunnel, le panneau reste inaccessible de façon fiable.
+Deux issues : un VPS SpaceNode avec `deploy/installer.sh` (même procédure que sur Oracle), ou ne pas utiliser le panneau
+et régler l'objectif mensuel directement dans le `config.json` du site.
+
+## Variante : héberger sur Railway (environ 5 $/mois)
 
 Railway fait tourner le bot et le panneau 24h/24, avec une adresse HTTPS fournie, sans rien installer.
 Offre **Hobby** : 5 $/mois, qui incluent 5 $ de consommation ; ce bot en consomme nettement moins.
