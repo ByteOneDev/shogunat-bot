@@ -88,7 +88,7 @@ Le mot de passe RCON donne un accès complet à la console : ne le partage jamai
 
 ## Étape 3 (au choix) : héberger sur SpaceNode (environ 0,50 €/mois)
 
-Hébergeur de bots avec panneau de contrôle. Les offres annoncent Python 3.10 ou plus, une redémarrage automatique et 24/7.
+Hébergeur de bots avec panneau de contrôle. Les offres annoncent Python 3.10 ou plus, un redémarrage automatique et un fonctionnement 24h/24.
 Le palier à 0,50 €/mois (512 Mo de RAM, 10 Go) suffit largement : ce programme demande environ 100 à 150 Mo.
 Paiement par 6 mois (environ 3 €). Le palier gratuit (64 Mo) est trop juste.
 
