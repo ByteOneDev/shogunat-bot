@@ -27,6 +27,38 @@ pour les ajouter, puis tu les retires (voir étape 4).
 
 ---
 
+## Boutique (/boutique)
+
+Boutique codée sur mesure, dans le style du site : grades, cosmétiques et offrandes. Paiement par **Stripe Checkout**
+(la carte est saisie chez Stripe, jamais chez nous) ; le joueur se connecte avec **Microsoft** pour prouver qu'il possède
+le compte Minecraft Java ; l'achat est livré en jeu par RCON. Activer avec `BOUTIQUE=on`.
+
+Sécurité (34 tests automatiques : `.venv/bin/python -m unittest discover -s tests -t .`) :
+- prix et total toujours recalculés par le serveur ; quantités, doublons et produits retirés refusés ;
+- commande validée uniquement par un événement Stripe signé, récent (< 5 min), jamais traité deux fois,
+  avec le montant, la devise et la session exacts ; sinon « anomalie », pas de livraison ;
+- connexion Microsoft avec `state` + PKCE, cookie à usage unique ; on ne garde que l'UUID et le pseudo, aucun jeton ;
+- sessions signées (clé propre à la boutique), cookies `HttpOnly`, `Secure`, `SameSite=Lax`, limités à `/boutique` ;
+- requêtes d'achat protégées contre le CSRF (en-tête dédié + même origine) et limitées en nombre ;
+- commandes de livraison : 3 variables seulement ({joueur}, {uuid}, {quantite}), pseudo et UUID revalidés,
+  aucune commande multiligne, jamais rejouée après une coupure ;
+- page : aucun script ni style intégré (CSP stricte), tout texte inséré comme texte, jamais comme HTML.
+
+Prix et produits : table `boutique_produits` (prix en centimes), modifiable plus tard depuis le panneau. Images des produits :
+`shogunat/boutique/static/img/produits/<fichier>` + colonne `image`. Commandes de livraison : colonne `commandes`
+(liste JSON), par défaut un simple message de remerciement.
+
+Mise en route :
+1. **Stripe** : crée un compte, récupère la clé de test `sk_test_...`. Pour tester en local :
+   `stripe listen --forward-to localhost:8080/boutique/stripe/webhook` (Stripe CLI) donne le `whsec_...`.
+2. **Microsoft** : inscription d'application Azure (comptes personnels), redirection `<PUBLIC_URL>/boutique/connexion/retour`,
+   un secret client. ⚠ Mojang doit valider l'application pour l'API Minecraft ; sans cela la connexion échoue (403), avec
+   un message clair pour le joueur.
+3. Aperçu local sans aucune clé : `BOUTIQUE=on BOUTIQUE_DEV=1 .venv/bin/python run.py`, puis http://localhost:8080/boutique/
+   (connexion fictive « Joueur_test » et paiement simulé, actifs uniquement sur localhost).
+4. En ligne : adresse HTTPS obligatoire (Stripe et Microsoft l'exigent), puis passer aux clés `sk_live_...`.
+5. Compléter les conditions de vente (`shogunat/boutique/static/conditions.html`, passages surlignés).
+
 ## Objectif mensuel du site
 
 Onglet **Objectif mensuel** du panneau : montant récolté, objectif du mois et devise. Le site (saison 1) lit ces valeurs à chaque
@@ -207,7 +239,9 @@ shogunat/db.py              base SQLite
 shogunat/minecraft.py       statut (ping), RCON, statistiques
 shogunat/bot.py             bot : mascotte, structure, statut, classements, annonces, /statut /classement /ip
 shogunat/interactions.py    tickets, FAQ (/faq), suggestions (/suggestion)
-shogunat/web.py             panneau : connexion Discord + API
+shogunat/web.py             panneau : connexion Discord + API (et montage de la boutique)
+shogunat/boutique/          boutique : catalogue, Microsoft, Stripe, livraison, pages
+tests/                      tests de sécurité de la boutique
 shogunat/static/            interface du panneau
 kubejs/shogunat_discord.js  à copier sur le serveur Minecraft
 railway.json                réglages Railway

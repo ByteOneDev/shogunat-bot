@@ -70,6 +70,8 @@ class Panneau:
 
     @web.middleware
     async def securite(self, request, handler):
+        if request.path == "/boutique" or request.path.startswith("/boutique/"):
+            return await handler(request)  # la boutique a ses propres règles (shogunat/boutique/web.py)
         if request.path.startswith("/api/"):
             request["user"] = await self.utilisateur(request)
             if not request["user"]:
@@ -460,10 +462,30 @@ def texte(d, cle, longueur_max):
 
 
 async def demarrer(bot):
+    if len(config.SESSION_SECRET) < 32:
+        # Sans secret solide, n'importe qui pourrait fabriquer un cookie de session : on en tire un au hasard.
+        config.SESSION_SECRET = secrets.token_urlsafe(48)
+        log.warning("SESSION_SECRET absent ou trop court : secret temporaire généré (les sessions sautent au redémarrage).")
     if MODE_DEV:
         log.warning("MODE APERÇU LOCAL : connexion sans Discord activée (DEV_ADMIN=1).")
-    runner = web.AppRunner(Panneau(bot).application())
+    runner = web.AppRunner(construire_application(bot))
     await runner.setup()
     await web.TCPSite(runner, config.WEB_HOST, config.WEB_PORT).start()
-    log.info("Panneau : %s (écoute sur %s:%s)", config.PUBLIC_URL, config.WEB_HOST, config.WEB_PORT)
+    log.info("Web : %s%s (écoute sur %s:%s)", config.PUBLIC_URL, " — boutique sur /boutique/" if config.BOUTIQUE_ACTIVE else "",
+             config.WEB_HOST, config.WEB_PORT)
     return runner
+
+
+def construire_application(bot):
+    """Panneau (si PANEL=on) + boutique sous /boutique (si BOUTIQUE=on). Utilisé aussi par les tests."""
+    if config.PANEL_ACTIF:
+        app = Panneau(bot).application()
+    else:
+        app = web.Application(client_max_size=64 * 1024)
+        if config.BOUTIQUE_ACTIVE:
+            app.router.add_get("/", lambda r: web.HTTPFound("/boutique/"))
+    if config.BOUTIQUE_ACTIVE:
+        from . import boutique
+        app.router.add_get("/boutique", lambda r: web.HTTPFound("/boutique/"))
+        app.add_subapp("/boutique/", boutique.application(bot))
+    return app

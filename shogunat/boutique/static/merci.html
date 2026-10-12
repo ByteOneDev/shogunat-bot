@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Merci — Boutique du Shogunat</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@600;800&family=Noto+Sans+JP:wght@400;500;700&display=swap">
+  <link rel="stylesheet" href="/boutique/static/boutique.css">
+</head>
+<body>
+  <header class="barre">
+    <div class="barre-interieur">
+      <a class="logo" href="/boutique/"><img src="/boutique/static/img/logo-petit.webp" alt="Shogunat SMP" width="246" height="86"></a>
+    </div>
+  </header>
+  <main class="page-simple">
+    <div class="carte-merci">
+      <img id="mascotte" src="/boutique/static/img/sakura.webp" alt="" width="140" height="140">
+      <span class="surtitre">ありがとう · Arigatō</span>
+      <h1 id="titre">Confirmation du paiement…</h1>
+      <p id="detail">On attend la confirmation de Stripe. Cela prend en général quelques secondes.</p>
+      <span class="pastille attente" id="pastille">En attente</span>
+      <div class="recap" id="recap"></div>
+      <button class="bouton" id="simuler" type="button" hidden>Simuler le paiement (aperçu local)</button>
+      <a class="bouton bouton-principal" href="/boutique/">Retour à la boutique</a>
+    </div>
+  </main>
+  <div class="notif" id="notif" role="status" aria-live="polite"></div>
+  <script src="/boutique/static/merci.js"></script>
+</body>
+</html>

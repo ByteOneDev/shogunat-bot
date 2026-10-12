@@ -53,6 +53,15 @@ RCON_PASSWORD = os.environ.get("RCON_PASSWORD", "")
 # Site public (GitHub Pages) autorisé à lire l'objectif mensuel exposé par le panneau
 SITE_ORIGIN = os.environ.get("SITE_ORIGIN", "https://byteonedev.github.io").strip().rstrip("/")
 
+# Boutique (shogunat/boutique/) : paiement Stripe, connexion Microsoft (compte Minecraft)
+BOUTIQUE_ACTIVE = os.environ.get("BOUTIQUE", "off").strip().lower() in {"on", "1", "oui", "yes", "true"}
+STRIPE_SECRET_KEY = os.environ.get("STRIPE_SECRET_KEY", "").strip()
+STRIPE_WEBHOOK_SECRET = os.environ.get("STRIPE_WEBHOOK_SECRET", "").strip()
+MS_CLIENT_ID = os.environ.get("MS_CLIENT_ID", "").strip()
+MS_CLIENT_SECRET = os.environ.get("MS_CLIENT_SECRET", "").strip()
+# Derrière un proxy (Caddy, Cloudflare…) : lire l'IP réelle dans X-Forwarded-For. À n'activer QUE derrière un proxy.
+TRUST_PROXY = os.environ.get("TRUST_PROXY", "").strip() == "1"
+
 # Images des mascottes (PNG carrés), publiées avec le site GitHub Pages
 ASSETS_URL = os.environ.get("ASSETS_URL", "https://byteonedev.github.io/sites-SMP/assets/mascottes").rstrip("/")
 

@@ -1,0 +1,151 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Boutique du Shogunat</title>
+  <meta name="description" content="Grades, cosmétiques et offrandes du Shogunat SMP. Paiement sécurisé par Stripe, livraison automatique en jeu.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@600;800&family=Noto+Sans+JP:wght@400;500;700&display=swap">
+  <link rel="stylesheet" href="/boutique/static/boutique.css">
+</head>
+<body>
+  <header class="barre">
+    <div class="barre-interieur">
+      <a class="logo" href="https://byteonedev.github.io/sites-SMP/" title="Retour au site"><img src="/boutique/static/img/logo-petit.webp" alt="Shogunat SMP" width="246" height="86"></a>
+      <nav aria-label="Rayons">
+        <a href="#grades">Grades</a>
+        <a href="#cosmetiques">Cosmétiques</a>
+        <a href="#soutien">Offrandes</a>
+        <a href="#fonctionnement">Comment ça marche</a>
+      </nav>
+      <div class="joueur" id="zone-joueur"></div>
+      <button class="bouton bouton-panier" id="ouvrir-panier" type="button" aria-label="Ouvrir le panier">
+        🏮 Panier <span class="compteur" id="compteur" hidden>0</span>
+      </button>
+    </div>
+  </header>
+
+  <section class="hero">
+    <div class="petales" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div>
+    <div class="lanternes" aria-hidden="true"><span></span><span></span><span></span><span></span></div>
+    <div class="hero-kanji" aria-hidden="true">商</div>
+    <div class="hero-contenu">
+      <span class="surtitre">幕府 · Le Comptoir du Shogun</span>
+      <h1>La boutique de l'archipel</h1>
+      <p class="hero-texte">Les marchands Mizuki tiennent les routes de la mer, mais ce comptoir appartient à tous : chaque achat finance
+        l'hébergement du serveur. On n'y vend que des grades, des cosmétiques et des offrandes, jamais un avantage de jeu.</p>
+      <div class="hero-actions">
+        <a class="bouton bouton-principal" href="#grades">Découvrir les grades</a>
+        <a class="bouton" href="#fonctionnement">Comment ça marche</a>
+      </div>
+      <ul class="garanties">
+        <li>Paiement sécurisé par Stripe</li>
+        <li>Compte Minecraft vérifié par Microsoft</li>
+        <li>Livraison automatique en jeu</li>
+      </ul>
+    </div>
+  </section>
+
+  <p class="bandeau-test" id="bandeau-test" hidden>Mode test : aucun vrai paiement n'est encaissé.</p>
+
+  <main>
+    <section class="rayon" id="grades" aria-labelledby="t-grades">
+      <div class="rayon-entete">
+        <span class="rayon-kanji" aria-hidden="true">階</span>
+        <h2 id="t-grades">Les grades</h2>
+        <p>Un titre qui brille dans le chat et sur Discord. Les grades ne donnent aucun avantage en combat ni en ressources :
+          ils honorent ceux qui font vivre l'archipel.</p>
+      </div>
+      <div class="grille" data-rayon="grades"></div>
+    </section>
+
+    <section class="rayon" id="cosmetiques" aria-labelledby="t-cosmetiques">
+      <div class="rayon-entete">
+        <span class="rayon-kanji" aria-hidden="true">飾</span>
+        <h2 id="t-cosmetiques">Cosmétiques</h2>
+        <p>Pétales, bannières et petits esprits : de quoi te distinguer sur les chemins du Shogunat, pour le seul plaisir des yeux.</p>
+      </div>
+      <div class="grille" data-rayon="cosmetiques"></div>
+    </section>
+
+    <section class="rayon" id="soutien" aria-labelledby="t-soutien">
+      <div class="rayon-entete">
+        <span class="rayon-kanji" aria-hidden="true">奉</span>
+        <h2 id="t-soutien">Offrandes au Temple</h2>
+        <p>Pendant les Années de Cendre, les greniers Shinrin nourrirent tout l'archipel. Une offrande, c'est la même idée :
+          aider le serveur à rester allumé, pour tout le monde.</p>
+      </div>
+      <div class="grille" data-rayon="soutien"></div>
+    </section>
+
+    <section class="rayon" id="mes-achats" aria-labelledby="t-achats" hidden>
+      <div class="rayon-entete">
+        <span class="rayon-kanji" aria-hidden="true">録</span>
+        <h2 id="t-achats">Mes achats</h2>
+      </div>
+      <div class="achats" id="liste-achats"></div>
+    </section>
+
+    <section class="rayon" id="fonctionnement" aria-labelledby="t-fonctionnement">
+      <div class="rayon-entete">
+        <span class="rayon-kanji" aria-hidden="true">道</span>
+        <h2 id="t-fonctionnement">Comment ça marche</h2>
+      </div>
+      <ol class="etapes">
+        <li><h3>Connecte ton compte</h3><p>Tu te connectes chez Microsoft, sur leur propre page : on vérifie que tu possèdes
+          Minecraft Java et on récupère ton pseudo. On ne voit jamais ton mot de passe.</p></li>
+        <li><h3>Paie en sécurité</h3><p>Le paiement se fait sur la page de Stripe, l'un des leaders du paiement en ligne.
+          Tes données bancaires ne passent jamais par nos serveurs.</p></li>
+        <li><h3>Reçois ton achat</h3><p>Dès que Stripe confirme le paiement, ton achat est activé en jeu. Si le serveur dort,
+          il le sera à son réveil.</p></li>
+      </ol>
+      <div class="questions">
+        <details><summary>Pourquoi se connecter avec Microsoft ?</summary>
+          <p>C'est la preuve que le compte Minecraft t'appartient : personne ne peut acheter à ta place ni se faire passer pour toi.
+            On ne garde que ton pseudo et ton identifiant Minecraft.</p></details>
+        <details><summary>Est-ce que je gagne un avantage en jeu ?</summary>
+          <p>Non. Les règles de Mojang interdisent de vendre des avantages de jeu, et c'est très bien ainsi : tout est cosmétique
+            ou purement symbolique.</p></details>
+        <details><summary>Je n'ai pas reçu mon achat.</summary>
+          <p>Si le serveur était éteint, la livraison se fait à son prochain réveil. Après une heure, ouvre un ticket dans #doléances
+            sur Discord : le staff a accès à toutes les commandes.</p></details>
+        <details><summary>Puis-je être remboursé ?</summary>
+          <p>Les achats sont des contenus numériques livrés immédiatement : tout est détaillé dans les
+            <a href="/boutique/conditions">conditions de vente</a>. En cas de souci, contacte le staff.</p></details>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <img src="/boutique/static/img/logo-petit.webp" alt="" width="246" height="86">
+    <nav>
+      <a href="https://byteonedev.github.io/sites-SMP/">Retour au site</a>
+      <a href="/boutique/conditions">Conditions de vente</a>
+      <a href="https://discord.gg/5ke2aBEKs" rel="noopener">Discord</a>
+    </nav>
+    <p>Shogunat SMP — serveur communautaire non affilié à Mojang ni à Microsoft.</p>
+  </footer>
+
+  <div class="voile" id="voile" hidden></div>
+  <aside class="panier" id="panier" aria-labelledby="t-panier" aria-hidden="true">
+    <div class="panier-entete">
+      <h2 id="t-panier">Ton panier</h2>
+      <button class="fermer" id="fermer-panier" type="button" aria-label="Fermer le panier">×</button>
+    </div>
+    <div class="panier-lignes" id="panier-lignes"></div>
+    <div class="panier-pied" id="panier-pied">
+      <div class="total"><span>Total</span><strong id="total">0,00 €</strong></div>
+      <label class="case" id="zone-conditions"><input type="checkbox" id="accepte">
+        <span>J'accepte les <a href="/boutique/conditions" target="_blank" rel="noopener">conditions de vente</a> et je demande la
+          livraison immédiate de mon achat numérique, en renonçant à mon droit de rétractation.</span></label>
+      <div id="zone-paiement"></div>
+      <p class="securite-note">🔒 Paiement chiffré sur la page de Stripe.</p>
+    </div>
+  </aside>
+
+  <div class="notif" id="notif" role="status" aria-live="polite"></div>
+  <script src="/boutique/static/boutique.js"></script>
+</body>
+</html>

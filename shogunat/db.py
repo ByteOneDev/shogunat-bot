@@ -1,5 +1,6 @@
 """Base SQLite : réglages, annonces, FAQ, tickets, suggestions, clans."""
 import json
+import re
 import sqlite3
 import time
 
@@ -116,10 +117,17 @@ def executer(sql, *args):
     return cur.lastrowid
 
 
+_IDENTIFIANT = re.compile(r"^[a-z_]{1,40}$")
+
+
 def maj(table, cle, valeur_cle, champs):
-    """UPDATE table SET champs... WHERE cle = valeur_cle (noms de colonnes vérifiés par l'appelant)."""
+    """UPDATE table SET champs... WHERE cle = valeur_cle. Les valeurs passent en paramètres ;
+    les noms (table, colonnes) doivent venir du code : on le vérifie pour qu'aucune donnée extérieure n'y entre."""
     if not champs:
         return
+    for nom in (table, cle, *champs):
+        if not isinstance(nom, str) or not _IDENTIFIANT.match(nom):
+            raise ValueError(f"nom de table ou de colonne refusé : {nom!r}")
     cols = ", ".join(f"{c} = ?" for c in champs)
     executer(f"UPDATE {table} SET {cols} WHERE {cle} = ?", *champs.values(), valeur_cle)
 
